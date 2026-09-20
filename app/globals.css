@@ -1,0 +1,338 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Mansourko Design System — GTA V / GTA Online pause-menu theme
+   Tailwind v4 is CSS-first: tokens declared here generate the utility classes
+   (bg-mansourko-gold, text-mansourko-sand, font-gta, font-menu, ...).
+--------------------------------------------------------------------------- */
+@theme {
+  /* Brand — distressed metal logo palette.
+     gold        = ANTIQUE GOLD   #bf9b6b  (central graphic base)
+     bronze      = DARK BRONZE    #6f4e2f  (graphic shadow & detail)
+     parchment   = PARCHMENT      #b09477  (torn border accent)
+     sand/gold-light are tints of the gold, for text and highlights that need
+     to clear contrast on the deep-noir plate. */
+  --color-mansourko-gold: #bf9b6b;
+  --color-mansourko-bronze: #6f4e2f;
+  --color-mansourko-gold-light: #dcbb8a;
+  --color-mansourko-sand: #d6b88c;
+  --color-mansourko-parchment: #b09477;
+
+  /* HUD */
+  --color-live-red: #e4453a; /* the ON AIR dot — the one non-brand hue, and
+                                deliberately so: it has to read as an alert */
+  --color-map-water: #241d15; /* mini-map bay. Warm noir rather than the usual
+                                 navy, which would be the only blue on the site */
+  --color-money-green: #2ecc71;
+  --color-hud-white: #ffffff;
+  --color-hud-cream: #f3e9db;
+  --color-hud-plate: #0e0d0b; /* opaque backing for HUD panels that sit over art */
+  --color-hud-backdrop: #121110; /* behind the scene, seen only while art loads */
+  --color-hud-overlay: rgba(0, 0, 0, 0.65);
+  --color-hud-panel: rgba(0, 0, 0, 0.45);
+  --color-wanted-star: #d6b88c;
+
+  /* Fonts — Arabic faces wired in app/fonts.ts and app/layout.tsx. The
+     fallbacks are the system Arabic faces, not Latin ones, so a slow font
+     load never drops the page into a Latin-metrics face. */
+  --font-gta: var(--font-display), "Tajawal", "Geeza Pro", "Noto Kufi Arabic",
+    sans-serif;
+  --font-menu: var(--font-ui), "Geeza Pro", "Segoe UI", "Noto Naskh Arabic",
+    ui-sans-serif, system-ui, sans-serif;
+  --font-quote: var(--font-quote-face), "Geeza Pro", "Noto Naskh Arabic",
+    serif;
+  --font-sans: var(--font-menu);
+
+  /* ---- HUD metrics ------------------------------------------------------
+     The pause-menu illusion only holds if the whole HUD fits one screen, so
+     this block is sized against viewport HEIGHT rather than a type scale. The
+     clamps are the scale; that is why there is no rem equivalent to use. */
+  /* Sized against viewport height so the menu fits one screen — but capped by
+     WIDTH too. On a tall portrait tablet (1024x1267) plain vh took the menu to
+     43px and wrapped two labels onto second lines; the column is only 384px
+     wide, and height alone knows nothing about that. */
+  --text-hud-menu: clamp(1.1rem, min(3.4vh, 3.1vw), 3rem);
+  --text-hud-legend: clamp(0.7rem, min(1.6vh, 1.5vw), 0.95rem);
+
+  --spacing-hud-logo: clamp(5rem, min(16.7vh, 15vw), 15rem);
+  --spacing-hud-xs: 1.2vh;
+  --spacing-hud-sm: 1.5vh;
+  --spacing-hud-md: 2.2vh;
+  --spacing-hud-top: 3vh;
+  /* Menu rows. Sized in vh like the type they hold, so the list keeps its
+     proportions instead of crowding on a short viewport. The gap keeps two
+     highlight bars from touching when the cursor moves between them. */
+  --spacing-menu-row: 1.15vh;
+  --spacing-menu-gap: 0.4vh;
+  --spacing-hud-bar: 4.25rem; /* mobile radio pill clears the floating logo */
+  --spacing-hud-bar-w: 95vw;
+  --spacing-menu-gutter: 26rem; /* content column clears the menu */
+  --spacing-menu-scrim: 46%; /* how far the menu's scrim reaches into the art */
+  /* The phone's bottom line carries the objective on one side and the
+     follower block on the other. The follower block is ~160px, so 58% left
+     them overlapping by 28px; this keeps a real gap between the two. */
+  --spacing-objective-phone: 46%;
+  /* The phone's HUD bands, measured: the logo/burger/countdown occupy the top
+     ~120px and the map/objective/stats cluster the bottom ~194px. Content is
+     held between them so it never scrolls underneath either. */
+  --spacing-hud-band-top: 8rem;
+  --spacing-hud-band-bottom: 12.5rem;
+  /* Desktop measures differently: the stats block runs to 180px at the top,
+     and the objective/quote row starts at 728px of 900 — so the bands are
+     shallower top and bottom than the phone's. */
+  --spacing-hud-band-top-lg: 11.5rem;
+  --spacing-hud-band-bottom-lg: 11rem;
+
+  /* Arabic sets taller than Latin: its ascenders and descenders collide at
+     the line heights a Latin face is happy with. */
+  --leading-arabic: 1.4;
+  --leading-arabic-loose: 1.45;
+  --leading-quote: 1.6;
+
+  /* ---- Elevation --------------------------------------------------------
+     Every HUD element floats over artwork, so its legibility comes from a
+     shadow rather than a background. The brand glows are mixed FROM the
+     colour tokens, so re-theming moves them too — which hand-written rgba()
+     never did. */
+  --drop-shadow-hud-text: 0 2px 10px rgb(0 0 0 / 0.85);
+  --drop-shadow-hud-item: 0 2px 8px rgb(0 0 0 / 0.7);
+  --drop-shadow-logo-glow: 0 0 26px
+    color-mix(in srgb, var(--color-mansourko-gold) 50%, transparent);
+  --drop-shadow-star-glow: 0 0 6px
+    color-mix(in srgb, var(--color-mansourko-sand) 55%, transparent);
+  --shadow-hud-panel: 0 4px 18px rgb(0 0 0 / 0.6);
+  --shadow-dot-glow: 0 0 8px
+    color-mix(in srgb, var(--color-mansourko-gold-light) 90%, transparent);
+  --shadow-menu-active:
+    0 0 22px color-mix(in srgb, var(--color-mansourko-gold) 55%, transparent),
+    inset 0 0 0 1px
+      color-mix(in srgb, var(--color-mansourko-sand) 45%, transparent),
+    4px 0 14px color-mix(in srgb, var(--color-mansourko-sand) 50%, transparent);
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: #121110;
+  color: var(--color-hud-white);
+  font-family: var(--font-menu);
+}
+
+/* Arabic joins its letters, so tracking is not a style knob here — it prises
+   the glyphs apart, and every `tracking-*` utility has been stripped from the
+   Arabic UI for that reason. Latin-only runs (the radio frequency, brand
+   names) keep the HUD's console spacing through this class instead. */
+.tracked {
+  letter-spacing: 0.12em;
+}
+
+/* Western digits inside RTL text: keep numerals and their unit letters in one
+   left-to-right run so "2.1M" and "1.2 كم" never get reordered. */
+.ltr-nums {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* The pause-menu illusion only holds where the whole HUD fits at once. */
+@media (min-width: 1024px) {
+  body {
+    overflow: hidden;
+  }
+}
+
+/* Thin GTA-style scrollbar for interior page content */
+.gta-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-mansourko-gold) transparent;
+}
+.gta-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.gta-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-mansourko-gold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Scene grade.
+
+   The plate, the car and the character are three different sources — stock
+   neon-purple art, a vector render, a photographic cutout — and hand-tuning a
+   filter per layer is what made them read as three cutouts pasted together.
+   They share ONE tone here and differ only in exposure, so they cannot drift
+   apart again. Replace the art and this whole block goes.
+--------------------------------------------------------------------------- */
+:root {
+  /* The plate is lit art, so the tone exists to pull the CUTOUTS into its
+     light: strip their own hue, re-tint through the brand's antique gold. */
+  --world-tone: grayscale(1) sepia(0.86) saturate(1.5) hue-rotate(-6deg);
+}
+
+/* Hero plate: finished art, lit and composited. Nothing is applied to it —
+   a filter here would only fight the grade the artwork already has. */
+.mansourko-plate {
+  filter: none;
+}
+
+/* Cutouts: same tone, lifted and with a touch more contrast so they separate
+   from the plate by depth rather than by colour. Individual layers adjust the
+   exposure through --character-exposure. */
+.mansourko-character {
+  filter: var(--world-tone)
+    var(--character-exposure, brightness(1.06) contrast(1.12));
+}
+
+/* ---------------------------------------------------------------------------
+   Utilities.
+
+   Everything below exists because the value is either a texture (a gradient
+   recipe, not a token) or genuinely dynamic — a route's gradient, a platform's
+   brand colour, an asset's own alpha used as a mask. Those arrive as CSS
+   custom properties set on the element, which keeps the VALUE dynamic while
+   the STYLING stays here.
+--------------------------------------------------------------------------- */
+
+/* Content area inset. The values come from components/HudInsets.tsx, which
+   measures the HUD corners; the fallbacks are what the bands used to be
+   hardcoded to, and only apply for the first paint before measurement. */
+@utility hud-inset {
+  top: var(--hud-band-top, 8rem);
+  bottom: var(--hud-band-bottom, 12.5rem);
+  @media (min-width: 1024px) {
+    top: var(--hud-band-top, 11.5rem);
+    bottom: var(--hud-band-bottom, 11rem);
+  }
+}
+
+/* Hero crop.
+   The plate is 16:9 and screens are narrower, so `cover` spills over the
+   sides. Measured against the art: the car runs 2%-95% and the character
+   40%-57%. At this aspect a laptop only loses about 5% of the width, but a
+   centred crop spends it evenly and clips the car's tail at 2%, so the window
+   is nudged left to clear it. A phone sees ~26% of the width, and the
+   character sits near the middle of the frame, so there the centre is right. */
+@utility hero-crop {
+  object-position: 50% 50%;
+  /* The left bias only makes sense on a LANDSCAPE viewport, where the crop is
+     shallow and shifting it clears the car's tail. A portrait tablet sees only
+     ~42% of the width, so biasing left cuts the character in half — there the
+     centre is the only sane window. */
+  @media (min-width: 1024px) and (min-aspect-ratio: 1 / 1) {
+    object-position: 25% 50%;
+  }
+}
+
+/* The mini-map is a fixed 128px tall while the menu scales with viewport
+   height, so on a short window the two are guaranteed to meet — and the map
+   would cover live menu items. It is the decorative half of that block (the
+   objective text carries the meaning), so below 760px tall it stands down. */
+@utility minimap-slot {
+  display: block;
+  /* The map is a fixed pixel size while the menu scales with viewport height,
+     so on a short DESKTOP window the two would meet. Phones are unaffected —
+     there the menu is an overlay, not a column. */
+  @media (min-width: 1024px) and (max-height: 700px) {
+    display: none;
+  }
+}
+
+/* Menu scrim. The pause menu sits on the reading edge, and this plate is at
+   its brightest right there — lit towers and a yacht directly under the gold
+   type. The vignette only darkens corners, so it does not help mid-column.
+   This fades the art down behind the menu and nowhere else, which is the same
+   device the game itself uses. Desktop only: on mobile the menu is an opaque
+   overlay already. */
+@utility menu-scrim {
+  /* Physical `to left` means "away from the menu": the site is RTL, so the
+     menu is pinned to the right and the scrim is anchored there too. The fade
+     must reach fully transparent BEFORE the element's far edge, or the edge
+     itself becomes a visible seam down the middle of the artwork. */
+  background: linear-gradient(
+    to left,
+    rgb(0 0 0 / 0.55) 0%,
+    rgb(0 0 0 / 0.3) 40%,
+    transparent 85%
+  );
+}
+
+/* Route scene gradient — the always-present fallback under the plate.
+   Set --scene-gradient on the element. */
+@utility scene-plate {
+  background-image: var(--scene-gradient);
+}
+
+/* Readability vignette: darkens only where HUD text lands, the corners. */
+@utility hud-vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 62%,
+    rgb(0 0 0 / 0.5) 100%
+  );
+}
+
+/* CRT scanlines, barely there — texture, not a token. */
+@utility hud-scanlines {
+  opacity: 0.035;
+  background-image: repeating-linear-gradient(
+    0deg,
+    #fff 0 1px,
+    transparent 1px 3px
+  );
+}
+
+/* Gold cast over a scene cutout, masked by the asset's own alpha so it lands
+   on the artwork and not its bounding box. Set --layer-mask to url(<src>). */
+@utility scene-cutout-tint {
+  mask-image: var(--layer-mask);
+  -webkit-mask-image: var(--layer-mask);
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  mask-position: bottom;
+  -webkit-mask-position: bottom;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+}
+
+/* Player ping, placed at the mini-map's fixed PLAYER coordinate. The SVG
+   viewBox and that coordinate are constants in MiniMap.tsx; these percentages
+   are those constants resolved. */
+@utility minimap-ping {
+  left: 18.75%; /* PLAYER.x 30 / VIEW_W 160 */
+  top: 70%; /* PLAYER.y 70 / VIEW_H 100 */
+}
+
+/* A platform's own brand colour, revealed on hover. Set --brand-color. */
+@utility brand-fill {
+  background-color: var(--brand-color);
+}
+
+/* Rotation timer under the social chip. Set --rotate-duration. */
+@utility rotation-timer {
+  animation: mansourko-rotate var(--rotate-duration) linear forwards;
+}
+
+/* Rotation timer under the social chip */
+@keyframes mansourko-rotate {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
